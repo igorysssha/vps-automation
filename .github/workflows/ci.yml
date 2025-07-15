@@ -1,0 +1,29 @@
+# .github/workflows/ci.yml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Линтинг bash-скриптов (shellcheck)
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck
+        run: |
+          find scripts -name "*.sh" | xargs -I {} shellcheck {}
+
+      # Линтинг YAML/Ansible
+      - name: Install yamllint & ansible-lint
+        run: pip install yamllint ansible-lint
+
+      - name: yamllint
+        run: yamllint .
+
+      # Проверка, что README не пустой
+      - name: README check
+        run: test -s README.m
